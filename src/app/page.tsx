@@ -1,5 +1,6 @@
 "use client";
 
+import Calendar from "@/components/slides/SlideCalendar";
 import TimeDate from "@/components/slides/SlideTimeDate";
 import "swiper/css";
 
@@ -10,7 +11,7 @@ export default function Home() {
     <div className="fullscreen-container">
       <Swiper>
         <SwiperSlide><TimeDate></TimeDate></SwiperSlide>
-        <SwiperSlide></SwiperSlide>
+        <SwiperSlide><Calendar></Calendar></SwiperSlide>
       </Swiper>
     </div>
   )
