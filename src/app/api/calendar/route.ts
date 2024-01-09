@@ -21,12 +21,18 @@ export async function GET(request: NextRequest) {
 
     oauth2Client.setCredentials({ access_token: code });
 
+    const min = new Date();
+    const max = new Date();
+    min.setDate(min.getDate() - 7);
+    max.setDate(max.getDate() + 7);
+    console.log('minmax', min, max);
+
     const events = await calendar.events.list({
         calendarId: 'primary',
-        timeMin: new Date().toISOString(), // Optional: filter by start time
-        showDeleted: false,               // Optional: exclude deleted events
-        singleEvents: true,              // Optional: only single events
-        orderBy: 'startTime',            // Optional: order by start time
+        timeMin: min.toISOString(),
+        timeMax: max.toISOString(),
+        showDeleted: false,
+        singleEvents: false,
     });
 
     if (events.status !== 200) {

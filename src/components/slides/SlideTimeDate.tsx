@@ -1,5 +1,6 @@
 "use client";
 
+import { Cyclone, ONE_SECOND } from "@/app/lib/util";
 import { useEffect, useState } from "react";
 
 const days: string[] = [
@@ -32,17 +33,12 @@ export default function TimeDate() {
     const [time, setTime] = useState("00:00");
     const [date, setDate] = useState("Monday 1 January");
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const now = new Date();
-            setTime(now.getHours() + ':' + now.getMinutes().toString().padStart(2, '0'))
-            setDate(days[now.getDay() - 1] + ' ' + now.getDate() + ' ' + months[now.getMonth()])
-            setIsLoading(false);
-        }, 1000);
-        return () => {
-            clearInterval(interval);
-        };
-    }, []);
+    Cyclone.React.repeatEvery(ONE_SECOND, () => {
+        const now = new Date();
+        setTime(now.getHours() + ':' + now.getMinutes().toString().padStart(2, '0'))
+        setDate(days[now.getDay() - 1] + ' ' + now.getDate() + ' ' + months[now.getMonth()])
+        setIsLoading(false);
+    });
 
     if (isLoading) {
         return (
