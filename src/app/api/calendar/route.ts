@@ -1,15 +1,22 @@
 import { google } from 'googleapis';
 import { NextRequest, NextResponse } from 'next/server';
 import { oauth2Client } from '../auth/route';
+import { uuidToToken } from '../auth/map';
 require('dotenv').config()
 
-
 export async function GET(request: NextRequest) {
-    const code = request.nextUrl.searchParams.get('c');
-    console.log('Code', code);
+    const uuid = request.nextUrl.searchParams.get('c');
 
-    if (code === null) {
-        return new Response(`Bad request, expected code`, {
+    if (uuid === null) {
+        return new Response(`Missing UUID`, {
+            status: 400,
+        });
+    }
+
+    const data = uuidToToken.get(uuid);
+
+    if (data === undefined) {
+        return new Response(`Invalid UUID`, {
             status: 400,
         });
     }
@@ -19,7 +26,10 @@ export async function GET(request: NextRequest) {
         auth: oauth2Client,
     });
 
-    oauth2Client.setCredentials({ access_token: code });
+    uuidToToken.set(uuid, { accessToken: data.accessToken, lastAccessed: Date.now() });
+    console.log('Refreshing', uuid);
+    
+    oauth2Client.setCredentials({ access_token: data.accessToken });
 
     const min = new Date();
     const max = new Date();

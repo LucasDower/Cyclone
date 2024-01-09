@@ -9,7 +9,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 export default function Home() {
   return (
     <div className="fullscreen-container">
-      <Swiper>
+      <Swiper suppressHydrationWarning>
         <SwiperSlide><TimeDate></TimeDate></SwiperSlide>
         <SwiperSlide><Calendar></Calendar></SwiperSlide>
       </Swiper>

@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Calendar, { Event } from "../Calendar";
 import moment from 'moment';
 import { Cyclone, ONE_MINUTE } from "@/app/lib/util";
+import { v4 as uuidv4 } from 'uuid';
+import QRCode from "react-qr-code";
 
 const colours = [
     '#7986cb',
@@ -23,72 +25,75 @@ const colours = [
 ];
 
 export default function SlideCalendar() {
+    const uuid = useId();
+
     const params = useSearchParams();
     const code = params.get('c');
 
     const [state, setState] = useState<'signed-out' | 'signed-in' | 'error'>('signed-out');
     const [items, setItems] = useState<Event[]>([]);
 
-    if (code !== null) {
-        Cyclone.React.repeatEvery(ONE_MINUTE, () => {
-            console.log('Ping!');
-            fetch(`/api/calendar?c=${code}`)
-                .then(async (res) => {
-                    if (res.ok) {
-                        const json = await res.json() as any[];
+    Cyclone.React.repeatEvery(4 * 1000, () => {
+        fetch(`/api/calendar?c=${uuid}`)
+            .then(async (res) => {
+                if (res.ok) {
+                    const json = await res.json() as any[];
 
-                        const newItems: Event[] = [];
+                    const newItems: Event[] = [];
 
-                        json.forEach((event) => {
-                            let start, end;
+                    json.forEach((event) => {
+                        let start, end;
 
-                            if (event.start.dateTime) {
-                                start = new Date(event.start.dateTime);
-                            } else if (event.start.date) {
-                                start = moment(event.start.date, "YYYY-MM-DD").toDate();
-                            }
+                        if (event.start.dateTime) {
+                            start = new Date(event.start.dateTime);
+                        } else if (event.start.date) {
+                            start = moment(event.start.date, "YYYY-MM-DD").toDate();
+                        }
 
-                            if (event.end.dateTime) {
-                                end = new Date(event.end.dateTime);
-                            } else if (event.end.date) {
-                                end = moment(event.end.date, "YYYY-MM-DD").toDate();
-                            }
+                        if (event.end.dateTime) {
+                            end = new Date(event.end.dateTime);
+                        } else if (event.end.date) {
+                            end = moment(event.end.date, "YYYY-MM-DD").toDate();
+                        }
 
-                            if (start && end) {
-                                newItems.push({
-                                    title: event.summary,
-                                    color: colours[event.colorId ?? 0],
-                                    start: start,
-                                    end: end,
-                                    allDay: start.getHours() === 0 && end.getHours() === 0,
-                                });
-                            }
-                        });
+                        if (start && end) {
+                            newItems.push({
+                                title: event.summary,
+                                color: colours[event.colorId ?? 0],
+                                start: start,
+                                end: end,
+                                allDay: start.getHours() === 0 && end.getHours() === 0,
+                            });
+                        }
+                    });
 
-                        setItems(newItems);
-                        setState('signed-in');
-                    } else {
-                        console.error(res.statusText);
-                        setState('error');
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    setState('error');
-                });
-        });
-    }
+                    setItems(newItems);
+                    setState('signed-in');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                setState('error');
+            });
+    });
 
     if (state === 'signed-in') {
         return (
             <Calendar events={items} />
         );
     } else if (state === 'signed-out') {
+        const url = `http://192.168.0.52:3000/api/auth?c=${uuid}`;
+
         return (
             <div className="flex flex-col flex-grow min-h-screen items-center justify-center bg-black">
-                <Link className="bg-white text-black rounded-lg px-4 py-2" href={`/api/auth`} prefetch={true}>
-                    Continue with Google
+                <Link target='_blank' className="underline" href={url} prefetch={true}>
+                    {url}
                 </Link>
+                <div className="mt-4 p-4 bg-white">
+                    <QRCode
+                        value={url}
+                    ></QRCode>
+                </div>
             </div>
         );
     } else {

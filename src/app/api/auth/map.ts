@@ -1,0 +1,1 @@
+export const uuidToToken = new Map<string, { lastAccessed: number, accessToken: string }>();
