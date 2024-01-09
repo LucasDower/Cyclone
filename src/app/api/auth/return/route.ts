@@ -13,5 +13,5 @@ export async function GET(request: NextRequest) {
     const { tokens } = await oauth2Client.getToken(code);
     const access_token = tokens.access_token;
 
-    return Response.redirect(`http://localhost:3000/?c=${access_token}`);
+    return Response.redirect(`${process.env.BASE_URL}/?c=${access_token}`);
 }
