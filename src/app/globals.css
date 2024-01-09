@@ -16,6 +16,7 @@
 body {
   background: black;
   color: rgb(var(--foreground-rgb));
+  cursor: none;
 }
 
 .fullscreen-container {
