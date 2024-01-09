@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 export namespace Cyclone {
     export namespace React {
-        export function repeatEvery(delay: number, callback: () => void) {
+        export function useRepeatEvery(delay: number, callback: () => void) {
             useEffect(() => {
                 callback();
             }, []);

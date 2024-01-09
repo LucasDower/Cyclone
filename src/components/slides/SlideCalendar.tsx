@@ -33,7 +33,7 @@ export default function SlideCalendar() {
     const [state, setState] = useState<'signed-out' | 'signed-in' | 'error'>('signed-out');
     const [items, setItems] = useState<Event[]>([]);
 
-    Cyclone.React.repeatEvery(4 * 1000, () => {
+    Cyclone.React.useRepeatEvery(4 * 1000, () => {
         fetch(`/api/calendar?c=${uuid}`)
             .then(async (res) => {
                 if (res.ok) {

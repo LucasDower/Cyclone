@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { oauth2Client } from "../route";
 import { uuidToToken } from "../map";
+import { oauth2Client } from "../client";
 
 export async function GET(request: NextRequest) {
     const uuid = request.nextUrl.searchParams.get('state');

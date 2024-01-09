@@ -1,7 +1,7 @@
 import { google } from 'googleapis';
 import { NextRequest, NextResponse } from 'next/server';
-import { oauth2Client } from '../auth/route';
 import { uuidToToken } from '../auth/map';
+import { oauth2Client } from '../auth/client';
 require('dotenv').config()
 
 export async function GET(request: NextRequest) {
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     uuidToToken.set(uuid, { accessToken: data.accessToken, lastAccessed: Date.now() });
     console.log('Refreshing', uuid);
-    
+
     oauth2Client.setCredentials({ access_token: data.accessToken });
 
     const min = new Date();
